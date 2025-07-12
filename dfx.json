@@ -1,0 +1,17 @@
+{
+  "canisters": {
+    "dotane_ic_backend": {
+      "candid": "src/dotane_ic_backend/dotane_ic_backend.did",
+      "package": "dotane_ic_backend",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

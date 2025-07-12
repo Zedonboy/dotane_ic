@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/dotane_ic_backend"
+]
+resolver = "2"
