@@ -1,0 +1,67 @@
+type AccessType = variant {
+  Private;
+  Public;
+  RestrictedAccess : RestrictedAccessNotes;
+};
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : blob;
+  headers : vec record { text; text };
+  certificate_version : opt nat16;
+};
+type HttpResponse = record {
+  body : blob;
+  headers : vec record { text; text };
+  upgrade : opt bool;
+  streaming_strategy : opt StreamingStrategy;
+  status_code : nat16;
+};
+type ListNotesResponse = record {
+  private_notes : vec Note;
+  published_notes : vec Note;
+};
+type Note = record {
+  id : text;
+  title : text;
+  updated_at : nat64;
+  content : text;
+  created_at : nat64;
+  author : text;
+};
+type RestrictedAccessNotes = record {
+  access_link_expiry : opt nat64;
+  num_of_guests : nat32;
+  guests : vec text;
+};
+type Result = variant { Ok : Note; Err : text };
+type Result_1 = variant { Ok; Err : text };
+type StreamingCallbackHttpResponse = record { token : opt null; body : blob };
+type StreamingStrategy = variant {
+  Callback : record {
+    token : null;
+    callback : func (null) -> (StreamingCallbackHttpResponse) query;
+  };
+};
+type UserProfile = record {
+  bio : text;
+  updated_at : nat64;
+  premium : bool;
+  name : text;
+  created_at : nat64;
+  email : text;
+  marked_public : bool;
+  avatar : text;
+};
+service : () -> {
+  delete_saved_note : (text) -> (Result);
+  http_request : (HttpRequest) -> (HttpResponse) query;
+  is_workspace_premium_user : () -> (bool) query;
+  list_notes : () -> (ListNotesResponse) query;
+  publish_note : (text, text, AccessType) -> (Result);
+  publish_saved_note : (text, AccessType) -> (Result_1);
+  save_note : (text, text) -> (Result_1);
+  set_owner_profile : (UserProfile) -> (Result_1);
+  unpublish_note : (text) -> (Result_1);
+  update_note : (text, text) -> (Result_1);
+}

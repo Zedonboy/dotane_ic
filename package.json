@@ -1,0 +1,21 @@
+{
+    "name": "dotane",
+    "version": "1.0.0",
+    "description": "[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)](https://flutter.dev) [![Internet Computer](https://img.shields.io/badge/ICP-Ready-green)](https://internetcomputer.org/)",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "prod-build": "NODE_ENV=production webpack",
+        "dev-build": "NODE_ENV=development webpack",
+        "build": "npm run build --ws"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "workspaces": [
+        "src/dotane",
+        "src/dotane_landing"
+    ],
+    "dependencies": {
+        "react-hot-toast": "^2.5.2"
+    }
+}

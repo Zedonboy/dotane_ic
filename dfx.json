@@ -4,6 +4,23 @@
       "candid": "src/dotane_ic_backend/dotane_ic_backend.did",
       "package": "dotane_ic_backend",
       "type": "rust"
+    },
+   
+    "internet_identity": {
+      "type": "custom",
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "frontend": {}
+    },
+    "dotane_landing": {
+      "entrypoint": "src/dotane_landing/out/index.html",
+      "source": ["src/dotane_landing/out"],
+      "type": "assets"
     }
   },
   "defaults": {

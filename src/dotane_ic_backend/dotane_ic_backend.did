@@ -1,3 +1,66 @@
+type AccessType = variant {
+  Private;
+  Public;
+  RestrictedAccess : RestrictedAccessNotes;
+};
+type CreateUserProfileRequest = record {
+  bio : text;
+  name : text;
+  email : text;
+  marked_public : bool;
+  avatar : text;
+};
+type ListNotesResponse = record {
+  private_notes : vec Note;
+  published_notes : vec Note;
+};
+type Note = record {
+  id : text;
+  title : text;
+  updated_at : nat64;
+  content : text;
+  created_at : nat64;
+  author : text;
+};
+type RestrictedAccessNotes = record {
+  access_link_expiry : opt nat64;
+  num_of_guests : nat32;
+  guests : vec text;
+};
+type Result = variant { Ok; Err : text };
+type Result_1 = variant { Ok : Note; Err : text };
+type Result_2 = variant { Ok : UserProfile; Err : text };
+type Result_3 = variant { Ok : text; Err : text };
+type UpdateUserProfileRequest = record {
+  bio : opt text;
+  name : opt text;
+  email : opt text;
+  marked_public : opt bool;
+  avatar : opt text;
+};
+type UserProfile = record {
+  bio : text;
+  updated_at : nat64;
+  premium : bool;
+  name : text;
+  created_at : nat64;
+  email : text;
+  marked_public : bool;
+  avatar : text;
+};
+type Workspace = record { domain : opt text; canister_id : text };
 service : {
-    "greet": (text) -> (text) query;
+  create_user_profile : (CreateUserProfileRequest) -> (Result);
+  delete_saved_note : (text) -> (Result_1);
+  get_my_profile : () -> (Result_2) query;
+  get_user_profile : (text) -> (Result_2) query;
+  get_workspaces : () -> (vec Workspace) query;
+  is_workspace_premium_user : () -> (bool) query;
+  list_notes : () -> (ListNotesResponse) query;
+  publish_note : (text, text, AccessType) -> (Result_1);
+  publish_saved_note : (text, AccessType) -> (Result);
+  save_note : (text, text) -> (Result_3);
+  unpublish_note : (text) -> (Result_1);
+  update_note : (text, text) -> (Result);
+  update_user_profile : (UpdateUserProfileRequest) -> (Result);
 }
