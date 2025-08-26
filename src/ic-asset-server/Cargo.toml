@@ -1,9 +1,12 @@
 [package]
-name = "dotane-types"
+name = "ic-asset-server"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-candid = "0.10.14"
 ic-stable-structures = "0.7.0"
+candid = "0.10.14"
+ic-cdk = "0.18.5"
 serde = { version = "1.0", features = ["derive"] }
+ic-http-certification = "3.0.3"
+lazy_static = "1.4.0"

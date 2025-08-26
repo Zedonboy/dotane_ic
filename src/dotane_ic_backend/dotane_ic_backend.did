@@ -10,6 +10,19 @@ type CreateUserProfileRequest = record {
   marked_public : bool;
   avatar : text;
 };
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : blob;
+  headers : vec record { text; text };
+  certificate_version : opt nat16;
+};
+type HttpResponse = record {
+  body : blob;
+  headers : vec record { text; text };
+  upgrade : opt bool;
+  status_code : nat16;
+};
 type ListNotesResponse = record {
   private_notes : vec Note;
   published_notes : vec Note;
@@ -22,6 +35,16 @@ type Note = record {
   created_at : nat64;
   author : text;
 };
+type PaymentPeriod = variant { Monthly; Yearly };
+type PremiumPaymentRequest = record {
+  payment_period : PaymentPeriod;
+  token_type : TokenType;
+};
+type PremiumPaymentResponse = record {
+  transaction_id : opt text;
+  message : text;
+  success : bool;
+};
 type RestrictedAccessNotes = record {
   access_link_expiry : opt nat64;
   num_of_guests : nat32;
@@ -30,7 +53,15 @@ type RestrictedAccessNotes = record {
 type Result = variant { Ok; Err : text };
 type Result_1 = variant { Ok : Note; Err : text };
 type Result_2 = variant { Ok : UserProfile; Err : text };
-type Result_3 = variant { Ok : text; Err : text };
+type Result_3 = variant { Ok : vec record { text; nat64 }; Err : text };
+type Result_4 = variant { Ok : SessionData; Err : text };
+type Result_5 = variant { Ok : text; Err : text };
+type SessionData = record {
+  session_id : text;
+  query_limit : opt nat32;
+  expires_at : nat64;
+};
+type TokenType = variant { CKUSDC; CKUSDT };
 type UpdateUserProfileRequest = record {
   bio : opt text;
   name : opt text;
@@ -49,17 +80,30 @@ type UserProfile = record {
   avatar : text;
 };
 type Workspace = record { domain : opt text; canister_id : text };
-service : {
+service : () -> {
+  create_session : () -> (SessionData);
   create_user_profile : (CreateUserProfileRequest) -> (Result);
   delete_saved_note : (text) -> (Result_1);
+  get_balance_tuple : () -> (text, text) query;
+  get_deposit_address : () -> (text) query;
   get_my_profile : () -> (Result_2) query;
+  get_premium_payment_info : () -> (Result_3) query;
+  get_session_data : (opt text) -> (Result_4) query;
   get_user_profile : (text) -> (Result_2) query;
   get_workspaces : () -> (vec Workspace) query;
+  http_request : (HttpRequest) -> (HttpResponse) query;
   is_workspace_premium_user : () -> (bool) query;
   list_notes : () -> (ListNotesResponse) query;
+  // Function to make a user premium by converting a string to principal
+  // This function is only available when NETWORK environment variable is set to "local"
+  make_user_premium : (text, nat64) -> (Result);
+  notify_deposit_premium_payment : (PremiumPaymentRequest) -> (
+      PremiumPaymentResponse,
+    );
+  notify_payment_approval : (text, PaymentPeriod) -> (PremiumPaymentResponse);
   publish_note : (text, text, AccessType) -> (Result_1);
   publish_saved_note : (text, AccessType) -> (Result);
-  save_note : (text, text) -> (Result_3);
+  save_note : (text, text) -> (Result_5);
   unpublish_note : (text) -> (Result_1);
   update_note : (text, text) -> (Result);
   update_user_profile : (UpdateUserProfileRequest) -> (Result);

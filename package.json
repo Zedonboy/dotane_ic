@@ -15,7 +15,10 @@
         "src/dotane",
         "src/dotane_landing"
     ],
+    "private": true,
     "dependencies": {
+        "@types/marked": "^6.0.0",
+        "marked": "^16.2.0",
         "react-hot-toast": "^2.5.2"
     }
 }

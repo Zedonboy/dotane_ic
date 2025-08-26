@@ -21,6 +21,16 @@
       "entrypoint": "src/dotane_landing/out/index.html",
       "source": ["src/dotane_landing/out"],
       "type": "assets"
+    },
+    "dotane_app": {
+      "entrypoint": "src/dotane/dist/index.html",
+      "source": ["src/dotane/dist"],
+      "type": "assets"
+    },
+    "dotane_asset_storage": {
+      "type": "rust",
+      "candid": "src/dotane_asset_storage/dotane_asset_storage.did",
+      "package": "dotane_asset_storage"
     }
   },
   "defaults": {

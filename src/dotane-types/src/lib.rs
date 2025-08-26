@@ -27,6 +27,12 @@ impl Storable for Note {
     }
     
     const BOUND: ic_stable_structures::storable::Bound = ic_stable_structures::storable::Bound::Unbounded;
+    
+    fn into_bytes(self) -> Vec<u8> {
+        self.to_bytes().into_owned()
+    }
+
+   
 }
 
 #[derive(CandidType, Clone, Debug, Deserialize)]
@@ -67,6 +73,10 @@ impl Storable for PublishedNote {
     }
     
     const BOUND: ic_stable_structures::storable::Bound = ic_stable_structures::storable::Bound::Unbounded;
+
+    fn into_bytes(self) -> Vec<u8> {
+        self.to_bytes().into_owned()
+    }
 }
 
 #[derive(CandidType, Serialize, Deserialize)]
@@ -114,4 +124,8 @@ impl Storable for UserProfile {
     }
     
     const BOUND: ic_stable_structures::storable::Bound = ic_stable_structures::storable::Bound::Unbounded;
+
+    fn into_bytes(self) -> Vec<u8> {
+        self.to_bytes().into_owned()
+    }
 }

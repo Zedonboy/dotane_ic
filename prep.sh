@@ -12,5 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cargo build --release --target wasm32-unknown-unknown --package dotane_user_storage && cp target/wasm32-unknown-unknown/release/dotane_user_storage.wasm bin/ && generate-did dotane_user_storage #candid-extractor target/wasm32-unknown-unknown/release/dotane_user_storage.wasm > src/dotane_user_storage/dotane_user_storage.did
+cargo build --release --target wasm32-unknown-unknown --package dotane_user_storage && cp target/wasm32-unknown-unknown/release/dotane_user_storage.wasm bin/ && candid-extractor target/wasm32-unknown-unknown/release/dotane_user_storage.wasm > src/dotane_user_storage/dotane_user_storage.did
 cargo build --release --target wasm32-unknown-unknown --package dotane_ic_backend && candid-extractor target/wasm32-unknown-unknown/release/dotane_ic_backend.wasm > src/dotane_ic_backend/dotane_ic_backend.did
+cargo build --release --target wasm32-unknown-unknown --package dotane_asset_storage && cp target/wasm32-unknown-unknown/release/dotane_asset_storage.wasm bin/ && candid-extractor target/wasm32-unknown-unknown/release/dotane_asset_storage.wasm > src/dotane_asset_storage/dotane_asset_storage.did
+
+# dfx canister update-settings dotane_asset_storage --add-controller u6s2n-gx777-77774-qaaba-cai

@@ -1,4 +1,13 @@
 {
+  "dotane_app": {
+    "ic": "pn534-waaaa-aaaaj-qnsfq-cai"
+  },
+  "dotane_asset_storage": {
+    "ic": "m2pxo-hyaaa-aaaaj-qnsna-cai"
+  },
+  "dotane_ic_backend": {
+    "ic": "pk45i-3yaaa-aaaaj-qnsfa-cai"
+  },
   "dotane_landing": {
     "ic": "56nt5-hiaaa-aaaaj-qnrga-cai"
   }

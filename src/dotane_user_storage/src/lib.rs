@@ -6,6 +6,7 @@ use dotane_types::{AccessType, ListNotesResponse, Note, PublishedNote, UserProfi
 use handlebars::Handlebars;
 // use ic_asset_server::{export_canister_methods, upload_assets::logic::StableState};
 use ic_cdk::{api::{self, canister_self, time}, export_candid, init, management_canister::{self, CanisterInfoArgs}, post_upgrade};
+use ic_certified_stable_assets_server::StableState;
 use ic_stable_structures::{memory_manager::{MemoryId, MemoryManager, VirtualMemory}, DefaultMemoryImpl, StableBTreeMap, StableBTreeSet, StableCell};
 use serde_bytes::ByteBuf;
 
@@ -47,11 +48,11 @@ thread_local! {
 
     static HANDLEBARS: RefCell<Handlebars<'static>> = RefCell::new(Handlebars::new());
 
-    static OWNER_PROFILE : RefCell<StableCell<UserProfile, Memory>> = RefCell::new(StableCell::new(MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(3))), UserProfile::default()).unwrap());
+    static OWNER_PROFILE : RefCell<StableCell<UserProfile, Memory>> = RefCell::new(StableCell::new(MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(3))), UserProfile::default()));
+
+    static STABLE_ASSET_STATE: RefCell<StableCell<StableState, Memory>> = RefCell::new(StableCell::new(MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(4))), StableState::default()));
 
     // static STABLE_ASSET_STATE: RefCell<StableCell<StableState, Memory>> = RefCell::new(StableCell::new(MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(3))), StableState::default()).unwrap());
-
-
 }
 
 
@@ -129,7 +130,9 @@ fn list_notes() -> ListNotesResponse {
     let mut published_notes_vec = Vec::new();
 
     PUBLISHED_NOTES.with_borrow(|published_notes| {
-        for (note_id, _) in published_notes.iter() {
+        for entry in published_notes.iter() {
+            let note_id = entry.key();
+            // let published_note = entry.value();
                 // TODO: Get the note from the storage canister
                 if let Some(note) = NOTES.with(|notes| notes.borrow().get(&note_id)) {
                     published_notes_vec.push(note);
@@ -310,7 +313,7 @@ fn home_handler(cntx: CanisterRouterContext) -> HttpResponse {
 #[ic_cdk::update(guard = "is_controller")]
 fn set_owner_profile(user: UserProfile) -> Result<(), String> {
   OWNER_PROFILE.with_borrow_mut(|profile| {
-    profile.set(user).expect("Failed to set owner profile");
+    profile.set(user);
   });
   Ok(())
 }
@@ -355,70 +358,10 @@ fn setup_http_router() {
 
 fn setup_handlebars() {
   HANDLEBARS.with_borrow_mut(|handlebars| {
-    // Register the formatDate helper
-    handlebars.register_helper("formatDate", Box::new(format_date_helper));
     
     handlebars.register_template_string("note", NOTE_TEMPLATE).unwrap();
     handlebars.register_template_string("workspace", WORKSPACE_HTML).unwrap();
   });
-}
-
-fn format_date_helper(
-    helper: &handlebars::Helper,
-    _: &handlebars::Handlebars,
-    _: &handlebars::Context,
-    _: &mut handlebars::RenderContext,
-    out: &mut dyn handlebars::Output,
-) -> handlebars::HelperResult {
-    // Get the timestamp (first parameter)
-    let timestamp = helper.param(0)
-        .ok_or_else(|| handlebars::RenderError::new("formatDate helper requires a timestamp parameter"))?
-        .value()
-        .as_u64()
-        .ok_or_else(|| handlebars::RenderError::new("formatDate helper requires a numeric timestamp"))?;
-    
-    // Get the format string (second parameter)
-    let format = helper.param(1)
-        .ok_or_else(|| handlebars::RenderError::new("formatDate helper requires a format parameter"))?
-        .value()
-        .as_str()
-        .ok_or_else(|| handlebars::RenderError::new("formatDate helper requires a string format"))?;
-    
-    // Convert milliseconds to seconds for chrono
-    let timestamp_seconds = timestamp / 1000;
-    
-    // Parse the timestamp as UTC
-    let datetime = chrono::DateTime::from_timestamp(timestamp_seconds as i64, 0)
-        .ok_or_else(|| handlebars::RenderError::new("Invalid timestamp"))?;
-    
-    // Format the date according to the provided format
-    let formatted_date = match format {
-        "MMMM Do, YYYY" => datetime.format("%B %-d, %Y").to_string(),
-        "MMMM D, YYYY" => datetime.format("%B %-d, %Y").to_string(),
-        "MMM Do, YYYY" => datetime.format("%b %-d, %Y").to_string(),
-        "MMM D, YYYY" => datetime.format("%b %-d, %Y").to_string(),
-        "YYYY-MM-DD" => datetime.format("%Y-%m-%d").to_string(),
-        "MM/DD/YYYY" => datetime.format("%m/%d/%Y").to_string(),
-        "DD/MM/YYYY" => datetime.format("%d/%m/%Y").to_string(),
-        "relative" => {
-            let now = chrono::Utc::now();
-            let duration = now.signed_duration_since(datetime);
-            
-            if duration.num_days() > 0 {
-                format!("{} days ago", duration.num_days())
-            } else if duration.num_hours() > 0 {
-                format!("{} hours ago", duration.num_hours())
-            } else if duration.num_minutes() > 0 {
-                format!("{} minutes ago", duration.num_minutes())
-            } else {
-                "Just now".to_string()
-            }
-        },
-        _ => datetime.format("%B %-d, %Y").to_string(), // Default format
-    };
-    
-    out.write(&formatted_date)?;
-    Ok(())
 }
 
 #[ic_cdk::query]
@@ -434,5 +377,5 @@ fn is_workspace_premium_user() -> bool {
 }
 
 export_candid!();
-ic_asset_server::export_canister_methods!();
+// ic_asset_server::export_canister_methods!();
 

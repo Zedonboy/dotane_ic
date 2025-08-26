@@ -1,0 +1,14 @@
+[package]
+name = "dotane_asset_storage"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.10.14"
+ic-cdk = "0.18.5"
+ic-certified-stable-assets-server = { path = "../ic-certified-stable-assets-server" }
+ic-stable-structures = "0.7.0"
+serde_bytes = "0.11.17"

@@ -10,12 +10,13 @@ crate-type = ["cdylib"]
 candid = "0.10.14"
 ic-cdk = "0.18.5"
 ic-cdk-timers = "0.12.2" # Feel free to remove this dependency if you don't need timers
-ic-stable-structures = "0.6.9"
+ic-stable-structures = "0.7.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_bytes = "0.11.17"
 dotane-types = { path = "../dotane-types" }
-ic-asset-server = {path = "../ic-asset-server", features = ["upload"]}
+# ic-asset-server = {path = "../ic-asset-server", features = ["upload"]}
 # ic-certified-assets = "0.3.0"
 canister_http_router = {git = "https://github.com/Zedonboy/canister_http_router.git", branch = "main"}
 handlebars = "6.3.2"
 ic-http-certification = "3.0.3"
+ic-certified-stable-assets-server = { path = "../ic-certified-stable-assets-server" }

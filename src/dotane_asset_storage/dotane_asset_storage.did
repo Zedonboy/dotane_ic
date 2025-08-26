@@ -1,0 +1,219 @@
+type AssetDetails = record {
+  key : text;
+  encodings : vec AssetEncodingDetails;
+  content_type : text;
+};
+type AssetEncodingDetails = record {
+  modified : int;
+  sha256 : opt blob;
+  length : nat;
+  content_encoding : text;
+};
+type AssetProperties = record {
+  headers : opt vec record { text; text };
+  is_aliased : opt bool;
+  allow_raw_access : opt bool;
+  max_age : opt nat64;
+};
+type BatchOperation = variant {
+  SetAssetProperties : SetAssetPropertiesArguments;
+  CreateAsset : CreateAssetArguments;
+  UnsetAssetContent : UnsetAssetContentArguments;
+  DeleteAsset : DeleteAssetArguments;
+  SetAssetContent : SetAssetContentArguments;
+  Clear : record {};
+};
+type CertifiedTree = record { certificate : blob; tree : blob };
+type CommitBatchArguments = record {
+  batch_id : nat;
+  operations : vec BatchOperation;
+};
+type CommitProposedBatchArguments = record { batch_id : nat; evidence : blob };
+type ComputeEvidenceArguments = record {
+  batch_id : nat;
+  max_iterations : opt nat16;
+};
+type ConfigurationResponse = record {
+  max_batches : opt nat64;
+  max_bytes : opt nat64;
+  max_chunks : opt nat64;
+};
+type ConfigureArguments = record {
+  max_batches : opt opt nat64;
+  max_bytes : opt opt nat64;
+  max_chunks : opt opt nat64;
+};
+type CreateAssetArguments = record {
+  key : text;
+  content_type : text;
+  headers : opt vec record { text; text };
+  allow_raw_access : opt bool;
+  max_age : opt nat64;
+  enable_aliasing : opt bool;
+};
+type CreateBatchResponse = record { batch_id : nat };
+type CreateChunkArg = record { content : blob; batch_id : nat };
+type CreateChunkResponse = record { chunk_id : nat };
+type DeleteAssetArguments = record { key : text };
+type EncodedAsset = record {
+  content : blob;
+  sha256 : opt blob;
+  content_type : text;
+  content_encoding : text;
+  total_length : nat;
+};
+type GetArg = record { key : text; accept_encodings : vec text };
+type GetChunkArg = record {
+  key : text;
+  sha256 : opt blob;
+  index : nat;
+  content_encoding : text;
+};
+type GetChunkResponse = record { content : blob };
+type GrantPermissionArguments = record {
+  permission : Permission;
+  to_principal : principal;
+};
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : blob;
+  headers : vec record { text; text };
+  certificate_version : opt nat16;
+};
+type HttpResponse = record {
+  body : blob;
+  headers : vec record { text; text };
+  upgrade : opt bool;
+  streaming_strategy : opt StreamingStrategy;
+  status_code : nat16;
+};
+type ListPermittedArguments = record { permission : Permission };
+type Permission = variant { Prepare; ManagePermissions; Commit };
+type Result = variant { Ok : HttpResponse; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
+type RevokePermissionArguments = record {
+  permission : Permission;
+  of_principal : principal;
+};
+type SetAssetContentArguments = record {
+  key : text;
+  sha256 : opt blob;
+  chunk_ids : vec nat;
+  content_encoding : text;
+};
+type SetAssetPropertiesArguments = record {
+  key : text;
+  headers : opt opt vec record { text; text };
+  is_aliased : opt opt bool;
+  allow_raw_access : opt opt bool;
+  max_age : opt opt nat64;
+};
+type StoreArg = record {
+  key : text;
+  content : blob;
+  sha256 : opt blob;
+  content_type : text;
+  aliased : opt bool;
+  content_encoding : text;
+};
+type StreamingCallbackHttpResponse = record {
+  token : opt GetChunkArg;
+  body : blob;
+};
+type StreamingStrategy = variant {
+  Callback : record {
+    token : GetChunkArg;
+    callback : func (GetChunkArg) -> (StreamingCallbackHttpResponse) query;
+  };
+};
+type UnsetAssetContentArguments = record {
+  key : text;
+  content_encoding : text;
+};
+service : () -> {
+  __candid_method_api_version : () -> (nat16) query;
+  __candid_method_authorize : (principal) -> ();
+  __candid_method_certified_tree : () -> (CertifiedTree) query;
+  __candid_method_clear : () -> ();
+  __candid_method_commit_batch : (CommitBatchArguments) -> ();
+  __candid_method_commit_proposed_batch : (CommitProposedBatchArguments) -> ();
+  __candid_method_compute_evidence : (ComputeEvidenceArguments) -> (opt blob);
+  __candid_method_configure : (ConfigureArguments) -> ();
+  __candid_method_create_asset : (CreateAssetArguments) -> ();
+  __candid_method_create_batch : () -> (CreateBatchResponse);
+  __candid_method_create_chunk : (CreateChunkArg) -> (CreateChunkResponse);
+  __candid_method_deauthorize : (principal) -> ();
+  __candid_method_delete_asset : (DeleteAssetArguments) -> ();
+  __candid_method_delete_batch : (CreateBatchResponse) -> ();
+  __candid_method_get : (GetArg) -> (EncodedAsset) query;
+  __candid_method_get_asset_properties : (text) -> (AssetProperties) query;
+  __candid_method_get_chunk : (GetChunkArg) -> (GetChunkResponse) query;
+  __candid_method_get_configuration : () -> (ConfigurationResponse);
+  __candid_method_grant_permission : (GrantPermissionArguments) -> ();
+  __candid_method_http_request : (HttpRequest) -> (Result) query;
+  __candid_method_http_request_streaming_callback : (GetChunkArg) -> (
+      StreamingCallbackHttpResponse,
+    ) query;
+  __candid_method_list : () -> (vec AssetDetails) query;
+  __candid_method_list_authorized : () -> (vec principal);
+  __candid_method_list_permitted : (ListPermittedArguments) -> (vec principal);
+  __candid_method_propose_commit_batch : (CommitBatchArguments) -> ();
+  __candid_method_retrieve : (text) -> (blob) query;
+  __candid_method_revoke_permission : (RevokePermissionArguments) -> ();
+  __candid_method_set_asset_content : (SetAssetContentArguments) -> ();
+  __candid_method_set_asset_properties : (SetAssetPropertiesArguments) -> ();
+  __candid_method_store : (StoreArg) -> ();
+  __candid_method_take_ownership : () -> ();
+  __candid_method_unset_asset_content : (UnsetAssetContentArguments) -> ();
+  __candid_method_validate_commit_proposed_batch : (
+      CommitProposedBatchArguments,
+    ) -> (Result_1);
+  __candid_method_validate_configure : (ConfigureArguments) -> (Result_1);
+  __candid_method_validate_grant_permission : (GrantPermissionArguments) -> (
+      Result_1,
+    );
+  __candid_method_validate_revoke_permission : (RevokePermissionArguments) -> (
+      Result_1,
+    );
+  __candid_method_validate_take_ownership : () -> (Result_1);
+  api_version : () -> (nat16) query;
+  authorize : (principal) -> ();
+  certified_tree : () -> (CertifiedTree) query;
+  clear : () -> ();
+  commit_batch : (CommitBatchArguments) -> ();
+  commit_proposed_batch : (CommitProposedBatchArguments) -> ();
+  compute_evidence : (ComputeEvidenceArguments) -> (opt blob);
+  configure : (ConfigureArguments) -> ();
+  create_asset : (CreateAssetArguments) -> ();
+  create_batch : () -> (CreateBatchResponse);
+  create_chunk : (CreateChunkArg) -> (CreateChunkResponse);
+  deauthorize : (principal) -> ();
+  delete_asset : (DeleteAssetArguments) -> ();
+  delete_batch : (CreateBatchResponse) -> ();
+  get : (GetArg) -> (EncodedAsset) query;
+  get_asset_properties : (text) -> (AssetProperties) query;
+  get_chunk : (GetChunkArg) -> (GetChunkResponse) query;
+  get_configuration : () -> (ConfigurationResponse);
+  grant_permission : (GrantPermissionArguments) -> ();
+  http_request : (HttpRequest) -> (Result) query;
+  http_request_streaming_callback : (GetChunkArg) -> (
+      StreamingCallbackHttpResponse,
+    ) query;
+  list : () -> (vec AssetDetails) query;
+  list_authorized : () -> (vec principal);
+  list_permitted : (ListPermittedArguments) -> (vec principal);
+  propose_commit_batch : (CommitBatchArguments) -> ();
+  retrieve : (text) -> (blob) query;
+  revoke_permission : (RevokePermissionArguments) -> ();
+  set_asset_content : (SetAssetContentArguments) -> ();
+  set_asset_properties : (SetAssetPropertiesArguments) -> ();
+  store : (StoreArg) -> ();
+  take_ownership : () -> ();
+  unset_asset_content : (UnsetAssetContentArguments) -> ();
+  validate_commit_proposed_batch : (CommitProposedBatchArguments) -> (Result_1);
+  validate_configure : (ConfigureArguments) -> (Result_1);
+  validate_grant_permission : (GrantPermissionArguments) -> (Result_1);
+  validate_revoke_permission : (RevokePermissionArguments) -> (Result_1);
+  validate_take_ownership : () -> (Result_1);
+}

@@ -36,6 +36,12 @@ impl Storable for UserCanister {
     }
     
     const BOUND: ic_stable_structures::storable::Bound = ic_stable_structures::storable::Bound::Unbounded;
+    
+    fn into_bytes(self) -> Vec<u8> {
+        self.to_bytes().into_owned()
+    }
+
+   
 }
 
 
@@ -80,6 +86,12 @@ impl Storable for UserNotes {
     }
     
     const BOUND: ic_stable_structures::storable::Bound = ic_stable_structures::storable::Bound::Unbounded;
+
+    fn into_bytes(self) -> Vec<u8> {
+        self.to_bytes().into_owned()
+    }
+
+
 }
 
 
@@ -105,4 +117,45 @@ pub struct UpdateUserProfileRequest {
 pub struct Workspace {
     pub canister_id: String,
     pub domain: Option<String>,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone)]
+pub struct SessionData {
+    pub session_id: String,
+    pub query_limit: Option<u32>,
+    pub expires_at: u64
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub enum TokenType {
+    CKUSDC,
+    CKUSDT,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub enum PaymentPeriod {
+    Monthly,
+    Yearly,
+}
+
+impl PaymentPeriod {
+    pub fn to_millis(&self) -> u64 {
+        match self {
+            PaymentPeriod::Monthly => 30 * 24 * 60 * 60 * 1000,
+            PaymentPeriod::Yearly => 365 * 24 * 60 * 60 * 1000,
+        }
+    }
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct PremiumPaymentRequest {
+    pub token_type: TokenType,
+    pub payment_period: PaymentPeriod,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct PremiumPaymentResponse {
+    pub success: bool,
+    pub message: String,
+    pub transaction_id: Option<String>,
 }

@@ -1,7 +1,7 @@
 [workspace]
-members = [ "src/dotane-types",
+members = [ "src/dotane-types", "src/dotane_asset_storage",
     "src/dotane_ic_backend",
-    "src/dotane_user_storage",
-    "src/ic-asset-server"
+    "src/dotane_user_storage", "src/ic-asset-server",
+    "src/ic-certified-stable-assets-server"
 ]
 resolver = "2"
