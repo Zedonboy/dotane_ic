@@ -94,9 +94,6 @@ service : () -> {
   http_request : (HttpRequest) -> (HttpResponse) query;
   is_workspace_premium_user : () -> (bool) query;
   list_notes : () -> (ListNotesResponse) query;
-  // Function to make a user premium by converting a string to principal
-  // This function is only available when NETWORK environment variable is set to "local"
-  make_user_premium : (text, nat64) -> (Result);
   notify_deposit_premium_payment : (PremiumPaymentRequest) -> (
       PremiumPaymentResponse,
     );
